@@ -1,112 +1,138 @@
-class hole:
-	def __init__(self,tag,edges):
-		self.tag = tag
-		self.edges = edges
-		self.left_parent = 999
-		self.right_parent = 999
-		self.left = 999
-		self.right = 999
-		self.left_child = 999
-		self.right_child = 999
-		self.filled = True
-		self.can_remove = False		
+import copy
 
-	
-	def remove_peg(self):
-		self.filled = False
+edges15 = ((-1,-1,-1,-1,2,3),(-1,1,-1,3,4,5),(1,-1,2,-1,5,6),
+           (-1,2,-1,5,7,8),(2,3,4,6,8,9),(3,-1,5,-1,9,10),
+           (-1,4,-1,8,11,12),(4,5,7,9,12,13),(5,6,8,10,13,14),
+           (6,-1,9,-1,14,15),(-1,7,-1,12,-1,-1),(7,8,11,13,-1,-1),
+           (8,9,12,14,-1,-1),(9,10,13,15,-1,-1),(10,-1,14,-1,-1,-1))
 
-	def place_peg(self):
-		self.filled = True
-	
-	def check_for_move(self):
-		move_set = []
-		if (self.filled):
-			if(not(self.left == 999 or self.right == 999)):
-				if(self.left.filled ^ self.right.filled):
-					if(self.left.filled):
-						move_set.append((self.tag,self.left.tag,self.right.tag))
-					else:
-						move_set.append((self.tag,self.right.tag,self.left.tag))
-			if(not(self.left_parent == 999 or self.right_child == 999)):
-				if(self.left_parent.filled ^ self.right_child.filled):
-					if(self.left_parent.filled):
-						move_set.append((self.tag,self.left_parent.tag,self.right_child.tag))
-					else:
-						move_set.append((self.tag,self.right_child.tag,self.left_parent.tag))
-			if(not(self.right_parent == 999 or self.left_child == 999)):
-				if(self.right_parent.filled ^ self.left_child.filled):
-					if(self.right_parent.filled):
-						move_set.append((self.tag,self.right_parent.tag,self.left_child.tag))
-					else:
-						move_set.append((self.tag,self.left_child.tag,self.right_parent.tag))
-		if(len(move_set) != 0):
-			self.can_remove = True
-		else:
-			self.can_remove = False
+class board15(object):
+    def __init__(self,state,edges):
+        self.pegs = state
+        self.actions = []
+        self.edges = edges
 
-		return (move_set)
-class board:
+    def copy(self):
+        return(board15(self.pegs.copy(),self.edges))
 
-	def __init__(self,empty_hole):
-		self.num_holes = 15
-		self.num_pegs = 14
-		self.empty_hole = empty_hole
-		self.holes = []
-		self.move_set = []
-		for i in range(15):
-			self.holes.append(hole(i+1,[]))
-		self.holes[empty_hole].filled = False
-		print("Num Holes: "+ str(len(self.holes)))
-	
-	def remove_peg(self,peg):
-		self.holes[peg].filled = False
+    def check_board(self):
+        actions = []
+        for peg in range(0,len(self.pegs)):
+            edges = self.edges[peg]
+            if(self.pegs[peg]):
+                    if(not((edges[0] == -1) or (edges[5] == -1))):
+                        if (self.pegs[edges[0]-1] ^ self.pegs[edges[5]-1]):
+                            if (self.pegs[edges[0] -1]):
+                                action = (peg + 1, edges[0], edges[5])
+                                actions.append(action)
+                            elif(self.pegs[edges[5]-1]):
+                                action = (peg + 1, edges[5], edges[0])
+                                actions.append(action)
+                    if(not((edges[1] == -1) or (edges[4] == -1))):
+                        if(self.pegs[edges[1]-1] ^ self.pegs[edges[4]-1]):
+                            if(self.pegs[edges[1]-1]):
+                                action = (peg + 1,edges[1],edges[4])
+                                actions.append(action)
+                            elif(self.pegs[edges[4]-1]):
+                                action = (peg + 1,edges[4],edges[1])
+                                actions.append(action)
+                    if(not((edges[2] == -1) or (edges[3] == -1))):
+                        if (self.pegs[edges[2]-1] ^ self.pegs[edges[3]-1]):
+                            if(self.pegs[edges[2]-1]):
+                                action = (peg + 1,edges[2],edges[3])
+                                actions.append(action)
+                            elif(self.pegs[edges[3]-1]):
+                                action = (peg + 1,edges[3],edges[2])
+                                actions.append(action)
+        return actions
+
+    def jump(self,action):
+        if(action == -1):
+            return self
+        else:
+            state = self.pegs.copy()
+            state[action[0] - 1] = False
+            state[action[1] - 1] = False
+            state[action[2] - 1] = True
+            return board15(state,self.edges)
+
+    def check_success(self):
+        num_pegs = 0
+        for check in range(0,15):
+            if (self.pegs[check]):
+                num_pegs += 1
+        if(num_pegs == 1 and len(self.check_board()) == 0):
+            return True
+        else:
+            print(num_pegs)
+            return False
+    
+    def print_board(self):
+        print("     " + str(self.pegs[0]) + "     ")
+        print("    " + str(self.pegs[1]) + " " + str(self.pegs[2]) + "    ")
+        print("   " + str(self.pegs[3]) + " " + str(self.pegs[4]) + " " + str(self.pegs[5]) + "   ")
+        print("  " + str(self.pegs[6]) + " " + str(self.pegs[7]) + " " + str(self.pegs[8]) + " " + str(self.pegs[9]) +"  ")
+        print(" " + str(self.pegs[10]) + " " + str(self.pegs[11]) + " " + str(self.pegs[12]) + " " + str(self.pegs[13]) + " " + str(self.pegs[14]) + " " )
+
+    
+
+class child_node(object):
+    def __init__(self,board,parent):
+        self.state = board.copy()
+        self.parent = parent
+        self.action = board.check_board()
+        
+        #self.cost = parent.cost + 1
+    def copy(self):
+        return (child_node(self.state.copy(),self.parent))
+
+def BFS(initial_game):
+    num_sol = 0
+    node = child_node(initial_game,[])
+    frontier = []
+    explored = []
+    frontier.append(node)
+    while frontier:
+        current = frontier.pop(0).copy()
+        current.state.print_board()
+        explored.append(current)
+        #print(current.action)
+        for action in current.action:
+            #print("CURRENT \n")
+            #current.state.print_board()
+            #print(action)
+            child =  child_node(current.state.jump(action),action)
+            #print("CHILD \n")
+            if current.state.pegs == child.state.pegs:
+                print ("LOTS OF PROBLEMS!")
+            #child.state.print_board()
+            #if child not in frontier and child not in explored:
+            
+            if child not in frontier and child not in explored:
+                if child.state.check_success():
+                    print("SUCCESS!")
+                    child.state.print_board()
+                    num_sol += 1
+                else:
+                    frontier.append(child)
+                    
+    #print("Failure")
+    return num_sol
+                   
+        
+            
+                
+        
+
+initial = []
+for i in range(15):
+    initial.append(True)
+initial[0] = False
 
 
-	def place_peg(self,peg):
-		self.holes[peg].filled = True
-
-	def check_board(self):
-		self.move_set = []
-		self.num_pegs = 0
-		for Peg in self.holes:
-			if (Peg.filled):
-				self.num_pegs += 1
-				moves = Peg.check_for_move()
-				for move in moves:
-					self.move_set.append(move)
-			else:
-				continue
-	#	print(self.move_set)
-				
-		
-	def jump(self,action):
-		next_game = self
-#		print(action[0], action[1], action[2])
-		next_game.remove_peg(action[1]-1)
-		next_game.holes[action[0]-1].remove_peg()
-		next_game.place_peg(action[2]-1)
-		next_game.check_board()
-		print("Num pegs left:" + str(next_game.num_pegs))
-		next_game.print_game()
-		print("possible moves: ", next_game.move_set)
-		return next_game
-
-	def print_game(self):
-		print("     " + str(self.holes[0].filled) + "     ")
-		print("    " + str(self.holes[1].filled) + " "+ str(self.holes[2].filled) +"   ")
-		print("  " + str(self.holes[3].filled) + " " + str(self.holes[4].filled) + " " + str(self.holes[5].filled) + "  ")
-		print(" " + str(self.holes[6].filled) + " " + str(self.holes[7].filled) + " " + str(self.holes[8].filled) + " " + str(self.holes[9].filled) + " ")
-		print(str(self.holes[10].filled) + " " + str(self.holes[11].filled) + " " + str(self.holes[12].filled) + " " + str(self.holes[13].filled) + " " +str(self.holes[14].filled))
-
-# Game = board(0)
-# for Peg in Game.holes:
-#	print(Peg.filled)
-#	print("\n")
-
-
-
-# NewGame = Game.jump((5,2,0))
-# print("AFTER JUMP")
-# for Peg in NewGame.holes:
-#	print (Peg.filled)
-
+game = board15(initial,edges15)
+game.print_board()
+already_played = []
+print("Number of Solutions")
+print(BFS(game))
+      
