@@ -8,7 +8,7 @@ class state:
 		self.num_pegs = board.num_pegs
 
 	def check_success(self):
-		if(self.num_pegs == 1 and len(self.actions) == 0):
+		if(self.num_pegs == 1):
 			return(True)
 		else:
 			return(False)
