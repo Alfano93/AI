@@ -212,7 +212,7 @@ def BFS(initial_game):
                 else:
                     if(current_amount != child.state.num_pegs):
                         current_amount = child.state.num_pegs
-                        print("Current:" + str(current_amount))
+                        #print("Current:" + str(current_amount))
 
                     frontier.append(child)
                     
@@ -234,10 +234,10 @@ for i in range(21):
 initial21[0] = False
 
 game15 = board15(initial15,edges15)
-game15.print_board()
+#game15.print_board()
 
 game21 = board21(initial21,edges21)
-game21.print_board()
+#game21.print_board()
 
 
 print("Calculating the 15 hole game")
