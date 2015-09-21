@@ -1,60 +1,98 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-import copy
 
-G = nx.DiGraph()
-root = str(7)
-G.add_node(str(root))
-lables = []
+def utility(node):
+    return 1
 
-previous = (0,0)
-
-def max_value(state,node):
-    if terminal_test(state):
-        return max_utility(state)
-    max_value = 0
-    for action in [1,2,3] :
-        if(state - action >= 1):
-            
-            lables.append(str(state-action))
-            value = min_value(state-action,copy.copy(str(state-action)))
-            G.add_node(str(state-action), label=str(state-action),node_color='r')
-            e = [(node,str(state-action),value)]
-            G.add_weighted_edges_from(e)
-            if (max_value < value):
-                max_value = value
-    return max_value
-
-def min_value(state,node):
-    if terminal_test(state):
-        return min_utility(state)
-    min_value = 0
-    for action in [1,2,3] :
-        if(state - action >= 1): 
-            value = max_value(state-action,copy.copy(str(state-action)))
-            G.add_node(str(state-action), label=str(state-action),node_color='b')
-            e = [(node,str(state-action),value)]
-            G.add_weighted_edges_from(e)
-            if (min_value < value):
-                min_value = value
-    
-    return min_value           
-
-def terminal_test(state):
-    if(state == 1):
+def terminal(node):
+    if node == 1:
         return True
     else:
         return False
 
-def max_utility(state):
-    return 1
+def actions(node):
+    moveSet = []
+    if (node - 1 > 0):
+        moveSet.append(1)
+    if (node - 2 > 0):
+        moveSet.append(2)
+    if (node - 3 > 0):
+        moveSet.append(3)
+    return moveSet
 
-def min_utility(state):
-    return -1
+def minimax(node,maximizingPlayer):
+    if terminal(node):
+        if maximizingPlayer:
+            return 1
+        else:
+            return -1
+    if maximizingPlayer:
+        bestValue = -float("inf")
+        for action in actions(node):
+            val = minimax(node - action,False)
+            bestValue = max(bestValue,val)
+        return bestValue
+    else:
+        bestValue = float("inf")
+        for action in actions(node):
+            val = minimax(node - action,True)
+            bestValue = min(bestValue,val)
+        return bestValue
 
-max_value(7,root)
-nx.draw_networkx(G,pos = nx.spring_layout(G,k=6,iterations=100))
+def max_decision(origin,G):
+    val = []
+    move = None
+    for action in actions(origin):
+        G.add_node(origin - action)
+        G.add_edge(origin,origin-action)
+        val.append(minimax(origin - action,False))
+    for i in range(len(val)):
+        value = val[i]
+        if value == 1:
+            move = i+1
+    if move == None:
+       move = 1
+    return move
 
+def min_decision(origin,G):
+    val = []
+    move = None
+    for action in actions(origin):
+        G.add_node(origin - action)
+        G.add_edge(origin,origin-action)
+        val.append(minimax(origin - action,True))
+    for i in range(len(val)):
+        print val[i]
+        value = val[i]
+        if value != 1:
+            move = i+1
+    if move == None:
+       move = 1
+    return move
 
-plt.savefig("graph.png")
-print("Number of edges:"+str(len(G.edges())))
+origin = 7
+G = nx.DiGraph()
+
+while(origin > 0):
+    print("max turn")
+    decision = max_decision(origin,G)
+    value = minimax(origin,True)
+    print (decision,value)
+    if (value == -float("inf")):
+        print("min wins")
+        break
+    print("min turn")
+    origin -= decision
+    print("origin:"+str(origin)) 
+    minD = min_decision(origin-decision,G)
+    min_val = minimax(origin,False)
+    if min_val == float('inf'):
+        print("max wins")
+        break
+
+    print(minD,min_val) 
+    origin -= minD
+    print("origin:"+str(origin))
+
+nx.draw_networkx(G)
+plt.savefig("graph.jpeg")
