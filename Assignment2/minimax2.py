@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import copy
+
 def utility(node):
     return 1
 
@@ -70,36 +71,20 @@ def minimax(node,maximizingPlayer,depth,alpha,beta,G):
     if maximizingPlayer:
         val = -float("inf")
         for action in actions(node):
-            #val = minimax(node - action,False,depth - 1,alpha,beta,G)
-            new_node = ((node - action),nx.utils.generate_unique_node())
-            G.add_node(new_node)
-            G.add_edge(node,new_node)
             val = max(val,minimax(node - action,False, depth - 1, alpha,beta,G))
-            #G.add_node(((node - action),val))
-            #G.add_edge((node,val),((node - action),val))
             alpha = max(alpha,val)
             if beta <= alpha:
                 #print("alpha pruned")
-                continue
-        #    G.add_node(((node - action),val))
-        #    G.add_edge((node,val),((node - action),val))
+                break
         return val
     else:
         val = float("inf")
         for action in actions(node):
-            #val = minimax(node - action,True,depth - 1,alpha,beta,G)
-            new_node = ((node - action),nx.utils.generate_unique_node())
-            G.add_node(new_node)
-            G.add_edge(node,new_node)
             val = min(val,minimax(node - action,True,depth - 1,alpha,beta,G))
-            #G.add_node(((node-action),val))
-            #G.add_edge((node,val),((node-action),val))
             beta = min(beta,val)
             if beta <= alpha:
                 #print("beta pruned")
-                continue
-        #    G.add_node(((node - action),val))
-        #    G.add_edge((node,val),((node - action),val))
+                break
         return val
 
 def max_decision(origin,G,depth):
@@ -108,10 +93,8 @@ def max_decision(origin,G,depth):
     moves = []
     G.add_node((origin))
     for action in actions(origin):
-        #G.add_node(origin - action)
-        #G.add_edge(origin,origin-action)
-        new_node = (origin - action, nx.utils.generate_unique_node())
 	val=minimax(origin-action,True,depth,-float("inf"),float("inf"),G)
+        new_node = ((origin-action),val)
         if val == 1:
            moves.append(action)
         values.append(val)
@@ -119,15 +102,8 @@ def max_decision(origin,G,depth):
         G.add_edge(origin,new_node)
     for i in range(len(values)):
         value = values[i]
-        #print(values)
-        #if value == 1:
-        #    moves.append(i+1) 
-        #if value == -float("inf"):
-        #    move = -float("inf")
-        #    break
     if len(moves) == 0:
        moves.append(1)
-    #print("max move:" + str(move))
     bestMove = -float("inf")
     print("max_moves:"+str(moves))
     for move in moves:
@@ -140,41 +116,26 @@ def min_decision(origin,G,depth):
     moves = [] 
     G.add_node((origin))
     for action in actions(origin):
-        #G.add_node(origin - action)
-        #G.add_edge(origin,origin-action)
-        new_node = (origin-action,nx.utils.generate_unique_node())
         val = minimax(origin-action,False,depth,-float("inf"),float("inf"),G)
+        new_node = (origin-action,val)
         if val == -1:
             moves.append(action)
         values.append(val)
         G.add_node(new_node)
         G.add_edge(origin,new_node)
     for i in range(len(values)):
-        #print val[i]
         value = values[i]
-        #if value == -1:
-            #moves.append(i+1)
-        #if value == float("inf"):
-        #    move = float("inf")
-        #    break
     print(moves)
     if len(moves) == 0:
        moves.append(1)
-    #print("min move:" + str(move))
     return min(moves)
 
-origin = 15 
+origin = 19
 depth = 1
 G = nx.DiGraph()
-#G.add_node(origin)
 while(origin > 0):
     #print("max turn")
     decision = max_decision((origin),G,depth)
-    #value = minimax(origin,True,3,G)
-    #print (decision,value)
-    #if (decision == -float("inf")):
-    #    print("min wins")
-    #    break
     if (origin == 1):
        print("min wins")
        break
@@ -182,17 +143,13 @@ while(origin > 0):
     print("origin_max:"+str(origin)) 
     #print("min turn")
     minD = min_decision((origin),G,depth)
-    #min_val = minimax(origin,False,3,G)
-    #if minD == float('inf'):
-    #    print("max wins")
-    #    break
     if (origin == 1):
         print("max wins")
         break
-    #print(minD,min_val) 
     origin -= minD
     print("origin_min:"+str(origin))
 
-nx.draw(G)
+pos = nx.circular_layout(G,scale=5,dim=2)
+nx.draw_networkx(G,pos)
 print("Number of Edges: " +str(len(G.edges())))
-plt.savefig("graph.jpeg")
+plt.savefig("graph19_2.jpeg")
