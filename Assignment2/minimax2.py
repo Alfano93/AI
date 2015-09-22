@@ -30,7 +30,7 @@ def factor(node,maxPlayer):
     if ((len(factors) % 2 == 0) and (maxPlayer)):
         return 1
     elif ((len(factors) % 2 == 1) and not(maxPlayer)):
-        return -1
+        return 1
     else:
         if len(factors) >= 4:
            twoCount = 0
@@ -49,12 +49,12 @@ def factor(node,maxPlayer):
                if(maxPlayer):
                    return 1 
                else:
-                   return -1
+                   return 1
            else:
                if(maxPlayer):
-                   return  -1
+                   return -1
                else:
-                   return 1
+                   return -1
 
 def minimax(node,maximizingPlayer,depth,alpha,beta,G):
     if terminal(node):
@@ -80,7 +80,7 @@ def minimax(node,maximizingPlayer,depth,alpha,beta,G):
             alpha = max(alpha,val)
             if beta <= alpha:
                 #print("alpha pruned")
-                break
+                continue
         #    G.add_node(((node - action),val))
         #    G.add_edge((node,val),((node - action),val))
         return val
@@ -97,7 +97,7 @@ def minimax(node,maximizingPlayer,depth,alpha,beta,G):
             beta = min(beta,val)
             if beta <= alpha:
                 #print("beta pruned")
-                break
+                continue
         #    G.add_node(((node - action),val))
         #    G.add_edge((node,val),((node - action),val))
         return val
@@ -105,55 +105,65 @@ def minimax(node,maximizingPlayer,depth,alpha,beta,G):
 def max_decision(origin,G,depth):
     val = 0
     values = []
-    move = None
+    moves = []
     G.add_node((origin))
     for action in actions(origin):
         #G.add_node(origin - action)
         #G.add_edge(origin,origin-action)
         new_node = (origin - action, nx.utils.generate_unique_node())
-	val=minimax(new_node[0],True,depth,-float("inf"),float("inf"),G)
+	val=minimax(origin-action,True,depth,-float("inf"),float("inf"),G)
+        if val == 1:
+           moves.append(action)
         values.append(val)
         G.add_node(new_node)
         G.add_edge(origin,new_node)
     for i in range(len(values)):
         value = values[i]
-        if value == 1:
-            move = i+1 
+        #print(values)
+        #if value == 1:
+        #    moves.append(i+1) 
         #if value == -float("inf"):
         #    move = -float("inf")
         #    break
-    if move == None:
-       move = 1
+    if len(moves) == 0:
+       moves.append(1)
     #print("max move:" + str(move))
-    return move
+    bestMove = -float("inf")
+    print("max_moves:"+str(moves))
+    for move in moves:
+        bestMove = max(bestMove,move)
+    return bestMove
 
 def min_decision(origin,G,depth):
     val = 0
     values = []
-    move = None
+    moves = [] 
     G.add_node((origin))
     for action in actions(origin):
         #G.add_node(origin - action)
         #G.add_edge(origin,origin-action)
         new_node = (origin-action,nx.utils.generate_unique_node())
-        val = minimax(new_node[0],False,depth,-float("inf"),float("inf"),G)
+        val = minimax(origin-action,False,depth,-float("inf"),float("inf"),G)
+        if val == -1:
+            moves.append(action)
         values.append(val)
         G.add_node(new_node)
         G.add_edge(origin,new_node)
     for i in range(len(values)):
         #print val[i]
         value = values[i]
-        if value == -1:
-            move = i+1
+        #if value == -1:
+            #moves.append(i+1)
         #if value == float("inf"):
         #    move = float("inf")
         #    break
-    if move == None:
-       move = 1
+    print(moves)
+    if len(moves) == 0:
+       moves.append(1)
     #print("min move:" + str(move))
-    return move
+    return min(moves)
 
-origin = 7
+origin = 15 
 depth = 1
 G = nx.DiGraph()
 #G.add_node(origin)
@@ -166,10 +176,10 @@ while(origin > 0):
     #    print("min wins")
     #    break
     if (origin == 1):
-       print("max wins")
+       print("min wins")
        break
     origin -= decision
-    #print("origin_max:"+str(origin)) 
+    print("origin_max:"+str(origin)) 
     #print("min turn")
     minD = min_decision((origin),G,depth)
     #min_val = minimax(origin,False,3,G)
@@ -177,7 +187,7 @@ while(origin > 0):
     #    print("max wins")
     #    break
     if (origin == 1):
-       # print("max wins")
+        print("max wins")
         break
     #print(minD,min_val) 
     origin -= minD
