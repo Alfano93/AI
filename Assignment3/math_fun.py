@@ -92,14 +92,14 @@ def var_multiply(expression):
 
 def var_divide(expression):
     var_div = re.compile('(\d+)\*(\w)/(\d+)\*(\w)')
-    m = var.div.match(expression)
+    m = var_div.match(expression)
     if m.group(3) != 0:
        if m.group(2) != m.group(4):
           print "cannot be simp"
           return expression
        else:
            a = m.group(1)
-           b = m.group(2)
+           b = m.group(3)
            if (int(a) != float(a) or int(b) != float(b)):
               return float(a)/float(b)
            else:
@@ -191,9 +191,9 @@ def like_terms(expression):
 
     #symbol = val[len(val)-1]
     new_val = copy.deepcopy(val)
-    new_val = new_val.replace(symbol,"")
+    #new_val = new_val.replace(symbol,"")
     #new_val = "+" + new_val
-    print(new_val)  
+    #print(new_val)  
     #print(val)  
     if val in coefs:
         pos = coefs.index(str(val))
@@ -213,13 +213,20 @@ def like_terms(expression):
         return expression
     if (len(coefs) == 0 and len(varis) == 0 and len(exps) == 1):
         return expression
+    if (len(coefs) == 1 or len(varis) == 1 or len(exps) == 1):
+        return expression
+
      
-    print "coefs " + str(coefs)
-    print "varis " + str(varis)
-    print "exps " +  str(exps)    
+    #print "coefs " + str(coefs)
+    #print "varis " + str(varis)
+    #print "exps " +  str(exps)    
     expression_parts = exps + varis + coefs
     new_expr = ""
+    if len(expression_parts) == 0:
+        return expression
+
     first_part = expression_parts[0]
+    
     #print first_part
     #symbol = first_part[0]
     #print symbol

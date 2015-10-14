@@ -38,6 +38,8 @@ def BFS(node):
     output_a = []
     while len(queue)>0:
         current_node = queue.popleft()
+        if current_node == None:
+            break
         #output.append(current_node)
         #print(current_node.leaf)
         if len(current_node.children) != 0:
@@ -153,22 +155,22 @@ possible_matches = expr.look_for_match(str(tree))
 possible_changes = expr.find_changes(str(tree))
 #print("possible matches: " + str(possible_matches)) 
 
-BFSarray = BFS(tree)
-DFSarray = DFS(tree)
+#BFSarray = BFS(tree)
+#DFSarray = DFS(tree)
 
 #print("BFS: " + str(BFSarray))
 #print("DFS: " + str(DFSarray))
 
 
-changeA = valid_changes(DFSarray)
-changeB = valid_changes(BFSarray)
+#changeA = valid_changes(DFSarray)
+#changeB = valid_changes(BFSarray)
     
 #print("A: " + str(changeA))
 #print("B: " + str(changeB))
-valid_moves = []
+#valid_moves = []
 new_tree = simplify_expression(copy.copy(tree))
-BFSarray = BFS(new_tree)
-valid_moves = valid_changes(BFSarray)
+#BFSarray = BFS(new_tree)
+#valid_moves = valid_changes(BFSarray)
 
 #while True:
 #    new_tree = simplify_expression(copy.copy(new_tree))
