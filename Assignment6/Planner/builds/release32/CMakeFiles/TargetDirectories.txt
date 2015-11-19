@@ -1,0 +1,4 @@
+/home/David/Planner/builds/release32/search/CMakeFiles/downward.dir
+/home/David/Planner/builds/release32/preprocess/CMakeFiles/preprocess.dir
+/home/David/Planner/builds/release32/CMakeFiles/translate.dir
+/home/David/Planner/builds/release32/VAL/CMakeFiles/validate.dir

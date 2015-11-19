@@ -1,0 +1,4 @@
+# Hashes of file build rules.
+ac27a4cabbf1952d638895b0415aaf17 CMakeFiles/translate
+160ec0a38ae171cba146d2a8aae3fac4 VAL/lex.yy.cc
+c307cf0e7e299d98dbc29102ae0d032a VAL/pddl+.cpp
