@@ -1,3 +1,7 @@
+Note: I included the planner program in the submission in case you would like to test the program. I found fast-downward to 
+      be much easier to use than blackbox and downward has a neat feature where you can change which searching algorithm is 
+      used to find a solution. It also provides a lot of nice statistics. 
+
 An Aggie does not lie, cheat or steal or tolerate those who do.
 
 How to run:
@@ -15,7 +19,7 @@ n = 4 rings -> starprob4.pddl
 n = 5 rings -> starprob5.pddl
 n = 6 rings -> starprob6.pddl
 
-Replace the problem file with the corrisponding number of rings problem file. 
+Replace the problem file with the corresponding number of rings problem file. 
 
 2. ./fast-downward.py --preprocess output.sas
 
